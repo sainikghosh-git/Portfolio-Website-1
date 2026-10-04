@@ -1,0 +1,19 @@
+# Backup / working copies
+*.backup
+*.pre-polish
+*.pre-humanize
+*.pre-status
+*.pre-variation
+*.pre-layout
+*.sound-backup
+*.pre-*
+
+# Logs
+server.log
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
