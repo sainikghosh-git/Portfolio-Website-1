@@ -16,15 +16,32 @@
 
   // --- Configuration ---
   const TOTAL_FRAMES = 192;
-  const LERP_EASE = 0.11; // Smooth damping coefficient (0.08 - 0.15 feels best)
   const CONCURRENT_DOWNLOADS = 6;
-  const MIN_FRAMES_TO_START = 8; // Reduced for faster preloader dismissal
-  const PRELOADER_MAX_WAIT = 5000; // Max wait time in ms before forcing dismiss
+  const MIN_FRAMES_TO_START = 8;
+  const PRELOADER_MAX_WAIT = 4000;
 
-  // Mobile optimizations
-  const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
-  const isLowEndDevice = navigator.hardwareConcurrency <= 4 || navigator.deviceMemory <= 4;
-  const MOBILE_FRAME_COUNT = isMobile || isLowEndDevice ? 48 : TOTAL_FRAMES; // 1/4 frames on mobile
+  // --- Device tiering: fewer frames + lower render cost on phones/tablets ---
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = navigator.deviceMemory || 4;
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const width = window.innerWidth;
+
+  let TIER = 'desktop';
+  if (width < 560 || (isTouch && width < 820) || cores <= 4 || memory <= 2) {
+    TIER = 'low';
+  } else if (width < 1024 || isTouch || cores <= 6 || memory <= 4) {
+    TIER = 'mid';
+  }
+
+  const PROFILE = {
+    low:     { frames: 28, dpr: 1,   lerp: 0.22, smooth: false, eager: 20 },
+    mid:     { frames: 48, dpr: 1.25, lerp: 0.16, smooth: false, eager: 30 },
+    desktop: { frames: 96, dpr: 2,   lerp: 0.11, smooth: true,  eager: 40 }
+  }[TIER];
+
+  const isMobile = TIER !== 'desktop';
+  const LERP_EASE = PROFILE.lerp;
+  const MOBILE_FRAME_COUNT = PROFILE.frames;
   const MOBILE_FRAME_STEP = TOTAL_FRAMES / MOBILE_FRAME_COUNT;
 
   // --- DOM Elements ---
@@ -83,9 +100,9 @@
     };
   }
 
-  // --- Canvas High-DPI Sizing & Responsive Fit ---
+  // --- Canvas Sizing & Responsive Fit ---
   function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, PROFILE.dpr);
     const displayWidth = window.innerWidth;
     const displayHeight = window.innerHeight;
 
@@ -94,8 +111,8 @@
       canvas.height = Math.round(displayHeight * dpr);
       canvas.style.width = displayWidth + 'px';
       canvas.style.height = displayHeight + 'px';
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
+      ctx.imageSmoothingEnabled = PROFILE.smooth;
+      ctx.imageSmoothingQuality = PROFILE.smooth ? 'high' : 'low';
       needsRedraw = true;
     }
   }
@@ -220,31 +237,15 @@
   // Initial check
   onScroll();
 
-  // --- Touch Scroll Support for Canvas ---
-  let touchStartY = 0;
-  let touchStartScrollY = 0;
-
-  function onTouchStart(e) {
-    touchStartY = e.touches[0].clientY;
-    touchStartScrollY = window.scrollY;
-  }
-
-  function onTouchMove(e) {
-    if (e.touches.length !== 1) return;
-    const deltaY = touchStartY - e.touches[0].clientY;
-    const newScrollY = touchStartScrollY + deltaY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const clampedScrollY = Math.max(0, Math.min(maxScroll, newScrollY));
-    window.scrollTo(0, clampedScrollY);
-  }
-
-  // Add touch listeners for better mobile scroll experience
-  if (isMobile) {
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-  }
+  // NOTE: Scroll-linked canvas relies on the browser's own native touch
+  // scrolling. Never call window.scrollTo() inside touchmove — it kills
+  // momentum/inertia and forces synchronous layout every event, which is the
+  // main cause of the stuttery feel on phones and tablets.
 
   // --- Physics-based Main Animation Loop (rAF) ---
+  let rafId = null;
+  let isPaused = false;
+
   function tick() {
     const diff = targetProgress - currentProgress;
 
@@ -263,12 +264,35 @@
       drawFrame(activeIndex);
       lastDrawnIndex = activeIndex;
       updateUI(activeIndex, currentProgress);
+      prefetchAroundScroll();
     }
 
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
   }
 
-  requestAnimationFrame(tick);
+  function startLoop() {
+    if (rafId === null && !isPaused) rafId = requestAnimationFrame(tick);
+  }
+
+  function stopLoop() {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  // Don't burn battery/CPU animating a background nobody can see.
+  document.addEventListener('visibilitychange', () => {
+    isPaused = document.hidden;
+    if (isPaused) {
+      stopLoop();
+    } else {
+      needsRedraw = true;
+      startLoop();
+    }
+  });
+
+  startLoop();
 
   // --- Progressive Preloader Architecture ---
   function updatePreloaderProgress() {
@@ -353,38 +377,61 @@
     await Promise.all(workers);
   }
 
+  // --- Lazy windowed frame loading ---
+  // Frames are fetched in a window around the current scroll position instead
+  // of streaming the whole sequence. This keeps memory and network flat on
+  // phones/tablets, which is what makes the scrub feel smooth.
+  const pending = new Set();
+
+  function requestFrameRange(centerIdx) {
+    if (centerIdx < 0 || centerIdx >= MOBILE_FRAME_COUNT) return;
+    const half = Math.ceil(MOBILE_FRAME_COUNT * 0.35);
+    const start = Math.max(0, centerIdx - half);
+    const end = Math.min(MOBILE_FRAME_COUNT - 1, centerIdx + half);
+    for (let i = start; i <= end; i++) {
+      const item = frameImages[i];
+      if (item && !item.loaded && !item.failed && !pending.has(i)) {
+        pending.add(i);
+        loadSingleFrame(i).finally(() => pending.delete(i));
+      }
+    }
+  }
+
   // --- Preloading Sequence ---
   async function startPreloading() {
-    // 1. First frame: Immediate priority
+    // 1. First frame: Immediate priority so the page paints instantly
     await loadSingleFrame(0);
     drawFrame(0);
 
-    // 2. Keyframes distributed evenly across sequence
+    // 2. Sparse keyframes across the whole sequence so any scroll position has
+    //    a real frame to fall back on (prevents long blank stretches).
     const keyframes = [];
-    const keyframeStep = Math.max(1, Math.floor(MOBILE_FRAME_COUNT / 16)); // ~16 keyframes
+    const keyframeStep = Math.max(1, Math.floor(MOBILE_FRAME_COUNT / 8));
     for (let i = 0; i < MOBILE_FRAME_COUNT; i += keyframeStep) {
       if (i !== 0) keyframes.push(i);
     }
-    // Also include last frame
     if (!keyframes.includes(MOBILE_FRAME_COUNT - 1)) {
       keyframes.push(MOBILE_FRAME_COUNT - 1);
     }
 
     await runBatchQueue(keyframes);
 
-    // 3. Fill in all remaining intermediate frames
-    const remainingFrames = [];
-    for (let i = 0; i < MOBILE_FRAME_COUNT; i++) {
-      if (i !== 0 && !keyframes.includes(i)) {
-        remainingFrames.push(i);
-      }
+    // 3. Load the opening window (most likely first thing a visitor scrubs to)
+    const eagerCount = Math.min(PROFILE.eager, MOBILE_FRAME_COUNT);
+    const opening = [];
+    for (let i = 1; i < eagerCount; i++) {
+      if (!keyframes.includes(i)) opening.push(i);
     }
+    runBatchQueue(opening);
+  }
 
-    // Continue background streaming of all remaining frames
-    runBatchQueue(remainingFrames).then(() => {
-      if (preloaderSubtext) preloaderSubtext.textContent = `All ${MOBILE_FRAME_COUNT} frames loaded`;
-      dismissPreloader();
-    });
+  // Keep a window of frames warm around wherever the user currently is.
+  let lastWindowCenter = -999;
+  function prefetchAroundScroll() {
+    const idx = Math.round(targetProgress * (MOBILE_FRAME_COUNT - 1));
+    if (idx === lastWindowCenter) return;
+    lastWindowCenter = idx;
+    requestFrameRange(idx);
   }
 
   // Start preloading as soon as DOM is ready
@@ -567,18 +614,9 @@
     });
   }, 600);
 
-  // --- Performance: Reduce quality during scroll ---
-  let lastScrollTime = 0;
-  window.addEventListener('scroll', () => {
-    lastScrollTime = Date.now();
-    canvas.style.willChange = 'transform';
-  }, { passive: true });
-
-  // Reset will-change after scroll stops
-  setInterval(() => {
-    if (Date.now() - lastScrollTime > 200) {
-      canvas.style.willChange = 'auto';
-    }
-  }, 250);
+  // --- Performance: promote the canvas to its own layer once ---
+  // (a permanent layer avoids re-rasterising the fixed stage on every frame)
+  canvas.style.willChange = 'transform';
+  canvas.style.transform = 'translateZ(0)';
 
 })();
