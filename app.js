@@ -34,9 +34,9 @@
   }
 
   const PROFILE = {
-    low:     { frames: 28, dpr: 1,   lerp: 0.22, smooth: false, eager: 20 },
-    mid:     { frames: 48, dpr: 1.25, lerp: 0.16, smooth: false, eager: 30 },
-    desktop: { frames: 96, dpr: 2,   lerp: 0.11, smooth: true,  eager: 40 }
+    low:     { frames: 60, dpr: 1,    lerp: 0.18, smooth: false, eager: 40 },
+    mid:     { frames: 96, dpr: 1.5,  lerp: 0.14, smooth: false, eager: 60 },
+    desktop: { frames: 144, dpr: 2,   lerp: 0.11, smooth: true,  eager: 72 }
   }[TIER];
 
   const isMobile = TIER !== 'desktop';
@@ -406,7 +406,7 @@
     // 2. Sparse keyframes across the whole sequence so any scroll position has
     //    a real frame to fall back on (prevents long blank stretches).
     const keyframes = [];
-    const keyframeStep = Math.max(1, Math.floor(MOBILE_FRAME_COUNT / 8));
+    const keyframeStep = Math.max(1, Math.floor(MOBILE_FRAME_COUNT / 16));
     for (let i = 0; i < MOBILE_FRAME_COUNT; i += keyframeStep) {
       if (i !== 0) keyframes.push(i);
     }
