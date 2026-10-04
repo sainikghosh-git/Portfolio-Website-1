@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Sainik Ghosh — B.Tech CSE &amp; AI Undergrad | Portfolio</title>
+  <meta name="description" content="Portfolio of Sainik Ghosh. First-year B.Tech Computer Science & AI student at Vedam School of Technology (partnership of Ajeenkya DY Patil University). Focused on AI, Data Science, Python, Java, and modern software development.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Preloader Screen -->
+  <div id="preloader" class="preloader">
+    <div class="preloader-backdrop"></div>
+    <div class="preloader-card">
+      <div class="preloader-spinner-box">
+        <svg class="spinner-svg" viewBox="0 0 50 50">
+          <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="2.5"></circle>
+          <circle id="spinner-fill" class="spinner-fill" cx="25" cy="25" r="20" fill="none" stroke-width="2.5"></circle>
+        </svg>
+        <span id="load-percentage" class="load-percentage">0%</span>
+      </div>
+      <div class="preloader-info">
+        <p class="preloader-title">INITIALIZING EXPERIENCE</p>
+        <p id="preloader-subtext" class="preloader-subtext">Buffering high-resolution frames...</p>
+      </div>
+      <div class="progress-bar-track">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Progress Bar -->
+  <div class="timeline-bar" aria-hidden="true">
+    <div id="timeline-progress" class="timeline-progress"></div>
+  </div>
+
+  <!-- Permanent Fixed Canvas Background (Sainik's 192-Frame Video Sequence) -->
+  <div class="canvas-stage" id="stage" aria-hidden="true">
+    <canvas id="sequence-canvas"></canvas>
+    <div class="stage-overlay"></div>
+  </div>
+
+  <!-- Minimal Frame HUD Counter (Bottom Right) -->
+  <aside class="frame-hud" aria-label="Animation Frame Status">
+    <div class="hud-pill">
+      <span class="hud-dot"></span>
+      <span class="hud-label">FRAME</span>
+      <span class="hud-count">
+        <strong id="frame-current">001</strong>
+        <span class="hud-sep">/</span>
+        <span class="hud-total">192</span>
+      </span>
+      <span class="hud-divider"></span>
+      <span id="frame-pct" class="hud-pct">0%</span>
+    </div>
+  </aside>
+
+  <!-- Sticky Top Navigation Header -->
+  <header class="site-header" id="header">
+    <div class="header-container">
+      <a href="#hero" class="brand-logo" aria-label="Sainik Ghosh Home">
+        <span class="logo-mark">SG</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#about" class="nav-link">ABOUT</a></li>
+          <li><a href="#work" class="nav-link">PROJECTS</a></li>
+          <li><a href="#capabilities" class="nav-link">CAPABILITIES</a></li>
+          <li><a href="#skills" class="nav-link">SKILLS</a></li>
+          <li><a href="#process" class="nav-link">PROCESS</a></li>
+          <li><a href="#contact" class="nav-link">CONTACT</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-action">
+        <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="btn-talk" aria-label="Open LinkedIn Profile">
+          <span class="talk-in-icon">in</span>
+          <span>LINKEDIN</span>
+          <span class="btn-arrow-diag">↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Website Content Container -->
+  <main class="page-content" id="main-content">
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero-section" id="hero">
+      <div class="hero-grid">
+        <div class="hero-text-col">
+          <span class="hero-kicker">
+            <span class="sparkle-icon">✦</span> FIRST-YEAR B.TECH CSE &amp; AI UNDERGRAD
+          </span>
+          
+          <h1 class="hero-title">
+            <span class="title-line">SAINIK</span>
+            <span class="title-line highlight-name">GHOSH</span>
+          </h1>
+
+          <div class="hero-role-bar">
+            <span class="role-pill">AI &amp; SOFTWARE DEVELOPER</span>
+            <span class="role-school">Vedam School of Technology &bull; ADYPU</span>
+          </div>
+
+          <p class="hero-description">
+            First-year Computer Science &amp; AI undergraduate passionate about Artificial Intelligence, Data Science, and software development. Focused on mastering programming, algorithms, and practical technologies through continuous hands-on learning.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#about" class="btn-primary">
+              <span>ABOUT ME</span>
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+            <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="btn-ghost linkedin-hero-btn">
+              <span class="social-in-badge">in</span>
+              <span>CONNECT ON LINKEDIN</span>
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-meta-col">
+          <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="availability-card" aria-label="LinkedIn Profile">
+            <span class="avail-star">✦</span>
+            <div class="avail-text">
+              <span class="avail-sub">FIRST-YEAR UNDERGRAD</span>
+              <strong class="avail-main">VEDAM TECH</strong>
+              <span class="avail-tag">ADYPU PARTNERSHIP <span class="btn-arrow-diag">↗</span></span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Scroll Prompt Cue -->
+      <div id="scroll-prompt" class="scroll-prompt" aria-label="Scroll prompt">
+        <div class="mouse-scroll-indicator">
+          <div class="mouse-wheel"></div>
+        </div>
+        <span class="scroll-prompt-text">SCROLL TO EXPLORE</span>
+      </div>
+    </section>
+
+    <!-- 2. STATS COUNTER BAR (REALISTIC & GROUNDED) -->
+    <section class="stats-section" aria-label="Highlights">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap">
+            <span class="stat-icon">✦</span>
+          </div>
+          <div class="stat-meta">
+            <strong class="stat-number">4</strong>
+            <span class="stat-label">LANGUAGES (PYTHON, JAVA, HTML, CSS)</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap">
+            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div class="stat-meta">
+            <strong class="stat-number">10+</strong>
+            <span class="stat-label">PRACTICAL &amp; ACADEMIC BUILDS</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap">
+            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+          </div>
+          <div class="stat-meta">
+            <strong class="stat-number">1st</strong>
+            <span class="stat-label">YEAR B.TECH CSE &amp; AI</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap">
+            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="stat-meta">
+            <strong class="stat-number">100%</strong>
+            <span class="stat-label">LEARNING VELOCITY &amp; DRIVE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ABOUT ME SECTION -->
+    <section class="about-section" id="about">
+      <div class="about-card">
+        <div class="about-header">
+          <span class="about-tag">
+            <span class="sparkle-icon">✦</span> ABOUT ME
+          </span>
+          <h2 class="about-headline">
+            Passionate About AI, Data Science &amp; Solving Problems Through Code
+          </h2>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-main-text">
+            <p class="about-p lead">
+              I’m a <strong>Computer Science &amp; Artificial Intelligence student</strong> at <strong>Vedam School of Technology</strong> (in partnership with <strong>Ajeenkya DY Patil University</strong>), passionate about Artificial Intelligence, Data Science, Software Development, and emerging technologies.
+            </p>
+            <p class="about-p">
+              I enjoy understanding how technology works beneath the surface, solving problems through code, and turning ideas into practical, reliable solutions. Currently, I’m focused on strengthening my skills in programming (Python, Java), data structures, algorithms, and software development through continuous learning and hands-on projects.
+            </p>
+            <p class="about-p">
+              My long-term goal is to build an impactful career in AI and Data Science — creating intelligent systems that solve real-world problems and make a meaningful difference. I’m also interested in technology-driven innovation, product development, and entrepreneurship. Alongside technical knowledge, I actively cultivate my communication, teamwork, leadership, and problem-solving abilities.
+            </p>
+            <div class="about-quote">
+              <span class="quote-bar"></span>
+              <p class="quote-text">
+                "I’m constantly learning, experimenting, and building, with the goal of becoming a skilled, adaptable, and impactful technology professional who creates solutions that truly matter and inspire."
+              </p>
+            </div>
+
+            <div class="about-cta-row">
+              <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                <span class="social-in-badge dark">in</span>
+                <span>CONNECT ON LINKEDIN</span>
+                <span class="btn-arrow-diag">↗</span>
+              </a>
+              <a href="#work" class="btn-ghost">
+                <span>VIEW MY WORK</span>
+                <span class="btn-arrow-down">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="about-sidebar">
+            <div class="info-block">
+              <span class="info-tag">INSTITUTION</span>
+              <h3 class="info-val">Vedam School of Technology</h3>
+              <p class="info-desc">In partnership with Ajeenkya DY Patil University</p>
+            </div>
+
+            <div class="info-block">
+              <span class="info-tag">ACADEMIC PROGRAM</span>
+              <h3 class="info-val">B.Tech in Computer Science &amp; AI</h3>
+              <p class="info-desc">1st Year Undergrad &bull; Cohort 2026–2030</p>
+            </div>
+
+            <div class="info-block">
+              <span class="info-tag">CORE PURSUITS</span>
+              <div class="info-tags-cloud">
+                <span class="tag-pill">Artificial Intelligence</span>
+                <span class="tag-pill">Data Science</span>
+                <span class="tag-pill">Python &amp; Java</span>
+                <span class="tag-pill">Agentic AI Tools</span>
+                <span class="tag-pill">DSA Foundations</span>
+                <span class="tag-pill">Communication &amp; Leadership</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FEATURED WORK SECTION (REALISTIC PROJECTS) -->
+    <section class="work-section" id="work">
+      <div class="section-header">
+        <div>
+          <span class="section-kicker">PORTFOLIO</span>
+          <h2 class="section-title">FEATURED WORK</h2>
+        </div>
+        <a href="#contact" class="section-link">
+          <span>GET IN TOUCH</span>
+          <span class="arrow-right">→</span>
+        </a>
+      </div>
+
+      <div class="work-grid">
+        <!-- Project 1 -->
+        <article class="work-card">
+          <div class="work-preview preview-ai">
+            <div class="work-glow"></div>
+            <div class="preview-mockup">
+              <div class="mockup-header">
+                <span class="mock-dot"></span>
+                <span class="mock-dot"></span>
+                <span class="mock-dot"></span>
+                <span class="mock-title">AgentFlow // Antigravity</span>
+              </div>
+              <div class="mockup-body">
+                <div class="mock-stat-badge">
+                  <span class="stat-label">Autonomous Exploration</span>
+                  <strong class="stat-val">Agent AI &bull; GenAI</strong>
+                </div>
+                <div class="mock-lines">
+                  <span class="m-line l1"></span>
+                  <span class="m-line l2"></span>
+                  <span class="m-line l3"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="work-content">
+            <div class="work-info">
+              <h3 class="work-name">Agentic AI &amp; Prompt Workflows</h3>
+              <p class="work-tags">PYTHON &bull; GOOGLE ANTIGRAVITY &bull; COPILOT</p>
+            </div>
+            <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="work-btn" aria-label="View Project on LinkedIn">
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="work-card">
+          <div class="work-preview preview-web">
+            <div class="work-glow"></div>
+            <div class="preview-mockup">
+              <div class="mockup-header">
+                <span class="mock-dot"></span>
+                <span class="mock-dot"></span>
+                <span class="mock-dot"></span>
+                <span class="mock-title">Canvas // 60FPS Video Sequence</span>
+              </div>
+              <div class="mockup-body mockup-center">
+                <div class="mockup-sphere">
+                  <div class="sphere-inner"></div>
+                </div>
+                <p class="mockup-hero-text">Dynamic Scroll Animation</p>
+              </div>
+            </div>
+          </div>
+          <div class="work-content">
+            <div class="work-info">
+              <h3 class="work-name">Interactive Canvas Portfolio</h3>
+              <p class="work-tags">HTML5 &bull; CSS3 &bull; JAVASCRIPT &bull; CANVAS 2D</p>
+            </div>
+            <a href="#hero" class="work-btn" aria-label="View Canvas Animation">
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="work-card">
+          <div class="work-preview preview-java">
+            <div class="work-glow"></div>
+            <div class="preview-mockup mockup-phone">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="phone-stat-ring">
+                  <span class="ring-val">JAVA</span>
+                  <span class="ring-lbl">DSA</span>
+                </div>
+                <div class="phone-list">
+                  <span class="p-item active">OOP Architectures</span>
+                  <span class="p-item">Array &amp; String Algorithms</span>
+                  <span class="p-item">Problem Solving Core</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="work-content">
+            <div class="work-info">
+              <h3 class="work-name">Java Problem Solving Suite</h3>
+              <p class="work-tags">JAVA &bull; OOP CONCEPTS &bull; DSA FOUNDATIONS</p>
+            </div>
+            <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="work-btn" aria-label="View Java Project">
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. CORE CAPABILITIES & TOOLS/TECHNOLOGIES SECTION -->
+    <section class="split-section" id="capabilities">
+      <div class="split-grid">
+        
+        <!-- Left: Core Capabilities -->
+        <div class="capabilities-column">
+          <span class="section-kicker">EXPERTISE</span>
+          <h2 class="section-title">CORE CAPABILITIES</h2>
+          <div class="capabilities-list">
+            
+            <div class="capability-item">
+              <div class="cap-icon-box">
+                <svg class="cap-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                  <path d="M2 17l10 5 10-5"></path>
+                  <path d="M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
+              <div class="cap-details">
+                <h3 class="cap-title">AI &amp; AGENTIC WORKFLOWS</h3>
+                <p class="cap-desc">
+                  Building autonomous agent workflows and utilizing tools like Google Antigravity, GitHub Copilot, and Generative AI to accelerate development.
+                </p>
+              </div>
+            </div>
+
+            <div class="capability-item">
+              <div class="cap-icon-box">
+                <svg class="cap-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <div class="cap-details">
+                <h3 class="cap-title">PROGRAMMING &amp; SOFTWARE DEV</h3>
+                <p class="cap-desc">
+                  Developing clean, structured code in Python and Java, focusing on logic, maintainability, and real-world problem solving.
+                </p>
+              </div>
+            </div>
+
+            <div class="capability-item">
+              <div class="cap-icon-box">
+                <svg class="cap-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <div class="cap-details">
+                <h3 class="cap-title">WEB TECHNOLOGIES</h3>
+                <p class="cap-desc">
+                  Building responsive, visually compelling interfaces with semantic HTML, modern CSS, dynamic Canvas, and client-side scripts.
+                </p>
+              </div>
+            </div>
+
+            <div class="capability-item">
+              <div class="cap-icon-box">
+                <svg class="cap-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+              <div class="cap-details">
+                <h3 class="cap-title">DATA STRUCTURES &amp; ALGORITHMS</h3>
+                <p class="cap-desc">
+                  Building deep problem-solving skills in Java DSA to write computationally efficient and mathematically sound algorithms.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Tools, Technologies & Active Learning -->
+        <div class="tools-column" id="skills">
+          <span class="section-kicker">TOOLKIT</span>
+          <h2 class="section-title">TOOLS &amp; TECHNOLOGIES</h2>
+
+          <!-- Skills Known -->
+          <div class="tools-group">
+            <span class="group-label">PROVEN PROFICIENCIES</span>
+            <div class="skills-grid">
+              <div class="skill-badge known">
+                <span class="skill-icon">🐍</span>
+                <span class="skill-name">Python</span>
+              </div>
+              <div class="skill-badge known">
+                <span class="skill-icon">☕</span>
+                <span class="skill-name">Java</span>
+              </div>
+              <div class="skill-badge known">
+                <span class="skill-icon">🌐</span>
+                <span class="skill-name">HTML5</span>
+              </div>
+              <div class="skill-badge known">
+                <span class="skill-icon">🎨</span>
+                <span class="skill-name">CSS3</span>
+              </div>
+              <div class="skill-badge known special-ai">
+                <span class="skill-icon">⚡</span>
+                <span class="skill-name">Google Antigravity</span>
+              </div>
+              <div class="skill-badge known special-ai">
+                <span class="skill-icon">🤖</span>
+                <span class="skill-name">GitHub Copilot</span>
+              </div>
+              <div class="skill-badge known special-ai">
+                <span class="skill-icon">🧠</span>
+                <span class="skill-name">Agentic AI</span>
+              </div>
+              <div class="skill-badge known special-ai">
+                <span class="skill-icon">✨</span>
+                <span class="skill-name">Generative AI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Currently Learning -->
+          <div class="tools-group learning-group">
+            <div class="learning-header">
+              <span class="group-label">CURRENTLY EXPANDING &amp; LEARNING</span>
+              <span class="learning-status-pill">
+                <span class="pulse-dot"></span> ACTIVE PURSUIT
+              </span>
+            </div>
+            
+            <div class="learning-cards-grid">
+              <div class="learning-card">
+                <div class="learn-top">
+                  <span class="learn-badge">IN PROGRESS</span>
+                  <span class="learn-cat">Language</span>
+                </div>
+                <h4 class="learn-title">JavaScript (ES6+)</h4>
+                <p class="learn-desc">Modern asynchronous JS, event loop mastery, functional programming, and web APIs.</p>
+              </div>
+
+              <div class="learn-card">
+                <div class="learn-top">
+                  <span class="learn-badge">IN PROGRESS</span>
+                  <span class="learn-cat">Frontend Library</span>
+                </div>
+                <h4 class="learn-title">React.js</h4>
+                <p class="learn-desc">Component-driven UI architecture, hooks, state management, and modern SPA lifecycle.</p>
+              </div>
+
+              <div class="learn-card">
+                <div class="learn-top">
+                  <span class="learn-badge">STARTING NOW</span>
+                  <span class="learn-cat">Core CS</span>
+                </div>
+                <h4 class="learn-title">DSA in Java</h4>
+                <p class="learn-desc">Data structures, algorithmic efficiency, computational complexity, and problem solving.</p>
+              </div>
+
+              <div class="learn-card">
+                <div class="learn-top">
+                  <span class="learn-badge">ACTIVE LEARNING</span>
+                  <span class="learn-cat">Creative Media</span>
+                </div>
+                <h4 class="learn-title">Video Editing &amp; Motion</h4>
+                <p class="learn-desc">Visual storytelling, pacing, cinematic transitions, and creative post-production.</p>
+              </div>
+
+              <div class="learn-card">
+                <div class="learn-top">
+                  <span class="learn-badge">CONTINUOUS</span>
+                  <span class="learn-cat">Cutting-Edge</span>
+                </div>
+                <h4 class="learn-title">Emerging AI Tools</h4>
+                <p class="learn-desc">Constantly exploring new LLM frameworks, agent tools, prompt design, and generative models.</p>
+              </div>
+
+              <div class="learn-card">
+                <div class="learn-top">
+                  <span class="learn-badge">EXPANDING</span>
+                  <span class="learn-cat">Professional</span>
+                </div>
+                <h4 class="learn-title">Communication Skills</h4>
+                <p class="learn-desc">Clear technical articulation, cross-functional collaboration, teamwork, and leadership.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic Affiliation Card -->
+          <div class="tools-group edu-group">
+            <span class="group-label">ACADEMIC PROGRAM</span>
+            <div class="edu-card">
+              <div class="edu-icon">🎓</div>
+              <div class="edu-info">
+                <h4 class="edu-title">Vedam School of Technology</h4>
+                <p class="edu-sub">Partnership of Ajeenkya DY Patil University</p>
+                <p class="edu-sub-small">B.Tech in Computer Science &amp; AI &bull; 1st Year Undergrad</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DEVELOPMENT PROCESS SECTION -->
+    <section class="process-section" id="process">
+      <div class="process-intro">
+        <span class="process-kicker">METHODOLOGY</span>
+        <h2 class="section-title">MY DEVELOPMENT PROCESS</h2>
+      </div>
+
+      <div class="process-timeline">
+        <!-- Step 1 -->
+        <div class="process-step">
+          <div class="step-num-box">
+            <span class="step-num">01</span>
+            <span class="step-line"></span>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <h3 class="step-title">DISCOVER</h3>
+            <p class="step-desc">Deconstructing requirements, researching technologies, and setting clear problem-solving objectives.</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="process-step">
+          <div class="step-num-box">
+            <span class="step-num">02</span>
+            <span class="step-line"></span>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+            </div>
+            <h3 class="step-title">DEFINE</h3>
+            <p class="step-desc">Designing clean data structures, choosing optimal algorithms, and structuring technical architecture.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="process-step">
+          <div class="step-num-box">
+            <span class="step-num">03</span>
+            <span class="step-line"></span>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                <path d="M2 2l7.586 7.586"></path>
+                <circle cx="11" cy="11" r="2"></circle>
+              </svg>
+            </div>
+            <h3 class="step-title">DEVELOP</h3>
+            <p class="step-desc">Writing clean, reliable code in Python, Java, and modern web stacks with AI assistant integration.</p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="process-step">
+          <div class="step-num-box">
+            <span class="step-num">04</span>
+            <span class="step-line"></span>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+            <h3 class="step-title">REFINE &amp; TEST</h3>
+            <p class="step-desc">Debugging edge cases, verifying algorithm efficiency, refining UI responsiveness, and continuous tuning.</p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="process-step">
+          <div class="step-num-box">
+            <span class="step-num">05</span>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">DELIVER</h3>
+            <p class="step-desc">Deploying working builds, learning from project outcomes, and iterating toward high-impact results.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CONTACT / CTA SECTION -->
+    <section class="contact-section" id="contact">
+      <div class="contact-banner">
+        <div class="contact-left">
+          <h2 class="contact-headline">
+            LET'S CREATE <br>
+            SOMETHING <br>
+            <span class="headline-highlight">EXTRAORDINARY <span class="contact-sparkle">✦</span></span>
+          </h2>
+          <p class="contact-subtext">
+            I’m a first-year Computer Science &amp; AI student eager to connect, collaborate on projects, and explore internship and learning opportunities.
+          </p>
+          <div class="contact-action-row">
+            <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="btn-primary btn-cta">
+              <span class="social-in-badge dark">in</span>
+              <span>CONNECT ON LINKEDIN</span>
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+            <a href="mailto:sainikghoshwork@gmail.com" class="btn-ghost">
+              <span>SEND AN EMAIL</span>
+              <span class="btn-arrow-diag">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-right">
+          <ul class="contact-meta-list">
+            <li class="contact-meta-item">
+              <div class="meta-icon-box linkedin-accent">
+                <span class="linkedin-symbol">in</span>
+              </div>
+              <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="meta-value linkedin-link">
+                linkedin.com/in/sainik-ghosh
+              </a>
+            </li>
+
+            <li class="contact-meta-item">
+              <div class="meta-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </div>
+              <a href="mailto:sainikghoshwork@gmail.com" class="meta-value">sainikghoshwork@gmail.com</a>
+            </li>
+
+            <li class="contact-meta-item">
+              <div class="meta-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+              </div>
+              <span class="meta-value">Vedam School of Tech &bull; ADYPU</span>
+            </li>
+
+            <li class="contact-meta-item">
+              <div class="meta-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <span class="meta-value">Pune, Maharashtra, India &bull; Global Remote</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <p class="footer-copy">&copy; 2026 Sainik Ghosh &bull; B.Tech Computer Science &amp; AI</p>
+        
+        <div class="footer-connect">
+          <span class="connect-label">LET'S CONNECT</span>
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/sainik-ghosh?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="social-btn social-in" aria-label="LinkedIn Profile">in</a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub Profile">gh</a>
+            <a href="mailto:sainikghoshwork@gmail.com" class="social-btn" aria-label="Email Me">✉</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
