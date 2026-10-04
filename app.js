@@ -34,9 +34,9 @@
   }
 
   const PROFILE = {
-    low:     { frames: 60, dpr: 1,    lerp: 0.18, smooth: false, eager: 40 },
-    mid:     { frames: 96, dpr: 1.5,  lerp: 0.14, smooth: false, eager: 60 },
-    desktop: { frames: 144, dpr: 2,   lerp: 0.11, smooth: true,  eager: 72 }
+    low:     { frames: 96,  dpr: 1,    lerp: 0.16, smooth: false, eager: 48, decodeWidth: 640 },
+    mid:     { frames: 144, dpr: 1.5,  lerp: 0.13, smooth: false, eager: 60, decodeWidth: 960 },
+    desktop: { frames: 192, dpr: 2,   lerp: 0.11, smooth: true,  eager: 72, decodeWidth: 1280 }
   }[TIER];
 
   const isMobile = TIER !== 'desktop';
@@ -90,11 +90,17 @@
   }
 
   // --- Initialize Frame Placeholders ---
+  // On phones/tablets we decode each frame straight into a downscaled bitmap.
+  // 1280x720 PNGs decoded at full size cost ~3.5MB of GPU memory each; scaling
+  // at decode time cuts that ~4x and makes every drawImage cheaper. The
+  // sequence sits at 0.15 opacity behind a scrim, so the softness is invisible.
+  const DECODE_WIDTH = PROFILE.decodeWidth;
+
   for (let i = 0; i < MOBILE_FRAME_COUNT; i++) {
     frameImages[i] = {
       index: i,
       actualIndex: Math.min(TOTAL_FRAMES - 1, Math.round(i * MOBILE_FRAME_STEP)),
-      img: new Image(),
+      img: null,
       loaded: false,
       failed: false
     };
@@ -163,8 +169,8 @@
 
     const cw = canvas.width;
     const ch = canvas.height;
-    const iw = img.naturalWidth || 1280;
-    const ih = img.naturalHeight || 720;
+    const iw = img.width || img.naturalWidth || 1280;
+    const ih = img.height || img.naturalHeight || 720;
 
     // Object-fit: cover calculation
     const hRatio = cw / iw;
@@ -332,7 +338,9 @@
         return;
       }
 
-      item.img.onload = () => {
+      const src = getFrameUrl(index);
+
+      const markDone = () => {
         item.loaded = true;
         loadedCount++;
         updatePreloaderProgress();
@@ -341,11 +349,10 @@
         if (index === 0 && lastDrawnIndex === -1) {
           drawFrame(0);
         }
-
         resolve(item);
       };
 
-      item.img.onerror = () => {
+      const markFailed = () => {
         console.warn(`Failed to load frame ${item.actualIndex + 1}`);
         item.failed = true;
         loadedCount++;
@@ -353,7 +360,39 @@
         resolve(item);
       };
 
-      item.img.src = getFrameUrl(index);
+      // Preferred path: fetch -> downscale in one step via createImageBitmap.
+      // Never holds a full-size decoded frame in memory.
+      if (window.createImageBitmap && DECODE_WIDTH < 1280) {
+        fetch(src)
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.blob();
+          })
+          .then((blob) =>
+            createImageBitmap(blob, {
+              resizeWidth: DECODE_WIDTH,
+              resizeQuality: 'medium'
+            })
+          )
+          .then((bitmap) => {
+            item.img = bitmap;
+            markDone();
+          })
+          .catch(() => loadViaImageTag());
+        return;
+      }
+
+      loadViaImageTag();
+
+      function loadViaImageTag() {
+        const img = new Image();
+        img.onload = () => {
+          item.img = img;
+          markDone();
+        };
+        img.onerror = markFailed;
+        img.src = src;
+      }
     });
   }
 
