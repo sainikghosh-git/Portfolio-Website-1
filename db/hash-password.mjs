@@ -1,18 +1,20 @@
 /**
- * Generates the ADMIN_PASSWORD_HASH value for .env.
+ * Generates ADMIN_PASSWORD_HASH for Node.js users.
  *
- * Usage:
  *   node db/hash-password.mjs 'your-admin-password'
  *
- * Prints a single line like:
- *   scrypt$3f2a...c1$9ab4...de
+ * If you don't have Node installed, just open db/hash-password.html in your
+ * browser instead - it produces an identical value using Web Crypto.
  *
- * Paste that into ADMIN_PASSWORD_HASH in your environment variables.
- * The raw password never gets stored or logged.
+ * Format (both paths agree):
+ *   pbkdf2-sha256$<iterations>$<saltHex>$<hashHex>
  */
 import crypto from 'node:crypto';
 
 const password = process.argv[2];
+const ITERATIONS = 600000;
+const SALT_BYTES = 16;
+const KEY_BYTES = 32;
 
 if (!password) {
   console.error("Usage: node db/hash-password.mjs 'your-admin-password'");
@@ -24,8 +26,8 @@ if (password.length < 12) {
   process.exit(1);
 }
 
-const salt = crypto.randomBytes(16);
-const hash = crypto.scryptSync(password, salt, 64);
+const salt = crypto.randomBytes(SALT_BYTES);
+const hash = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEY_BYTES, 'sha256');
 
-console.log(`scrypt$${salt.toString('hex')}$${hash.toString('hex')}`);
+console.log(`pbkdf2-sha256$${ITERATIONS}$${salt.toString('hex')}$${hash.toString('hex')}`);
 console.error('\nCopy the first line above into ADMIN_PASSWORD_HASH.');

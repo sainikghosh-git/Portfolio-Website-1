@@ -59,8 +59,13 @@ function verifyToken(token) {
 }
 
 /**
- * Verify a submitted password against the scrypt hash in ADMIN_PASSWORD_HASH.
- * Format: scrypt$<saltHex>$<hashHex>
+ * Verify a submitted password against the PBKDF2 hash in ADMIN_PASSWORD_HASH.
+ * Format: pbkdf2-sha256$<iterations>$<saltHex>$<hashHex>
+ *
+ * PBKDF2 rather than scrypt so the matching hash can be generated in a browser
+ * via Web Crypto (no Node install required). Parameters match Web Crypto's
+ * PBKDF2 exactly, so a hash made by db/hash-password.html verifies here.
+ * 600k iterations is the OWASP guidance for PBKDF2-HMAC-SHA256.
  */
 function verifyPassword(candidate) {
   const stored = process.env.ADMIN_PASSWORD_HASH;
@@ -68,15 +73,25 @@ function verifyPassword(candidate) {
 
   const parts = stored.split('$');
   const scheme = parts[0];
-  const saltHex = parts[1];
-  const hashHex = parts[2];
+  const iterations = Number(parts[1]);
+  const saltHex = parts[2];
+  const hashHex = parts[3];
 
-  if (scheme !== 'scrypt' || !saltHex || !hashHex) {
+  if (scheme !== 'pbkdf2-sha256' || !saltHex || !hashHex) {
     throw new Error('ADMIN_PASSWORD_HASH is malformed');
+  }
+  if (!Number.isInteger(iterations) || iterations < 100000) {
+    throw new Error('ADMIN_PASSWORD_HASH has an invalid iteration count');
   }
 
   const expected = Buffer.from(hashHex, 'hex');
-  const actual = crypto.scryptSync(candidate, Buffer.from(saltHex, 'hex'), expected.length);
+  const actual = crypto.pbkdf2Sync(
+    candidate,
+    Buffer.from(saltHex, 'hex'),
+    iterations,
+    expected.length,
+    'sha256'
+  );
 
   // Constant-time compare so a wrong password can't be brute-forced byte by byte.
   return crypto.timingSafeEqual(expected, actual);
