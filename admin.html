@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Inbox — Sainik Ghosh</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230e0d11'/><text x='16' y='22' font-family='monospace' font-size='14' font-weight='700' fill='%23f5f5f7' text-anchor='middle'>SG</text></svg>">
+  <style>
+    /* Scoped to .inbox-* so nothing here can leak into the portfolio styles. */
+    body { min-height: 100vh; }
+    .inbox-shell { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+    .inbox-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; margin-bottom: 32px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .inbox-title { font-family: var(--font-mono); font-size: 1.1rem; letter-spacing: 0.16em; text-transform: uppercase; }
+    .inbox-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary); letter-spacing: 0.1em; }
+
+    .inbox-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; }
+    .inbox-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .inbox-label { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; color: var(--text-tertiary); text-transform: uppercase; }
+    .inbox-input {
+      font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary);
+      background: var(--bg-primary); border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 12px 14px; width: 100%;
+    }
+    .inbox-input:focus { outline: none; border-color: var(--accent-cyan); }
+    .inbox-btn {
+      font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+      padding: 13px 26px; border-radius: 999px; border: 1px solid #fff;
+      background: #fff; color: #0b0a0e; cursor: pointer; transition: background 0.15s ease;
+    }
+    .inbox-btn:hover { background: var(--accent-cyan); border-color: var(--accent-cyan); }
+    .inbox-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .inbox-btn-quiet { background: transparent; color: var(--text-secondary); border-color: var(--border-medium); }
+    .inbox-btn-quiet:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+    .inbox-status { font-family: var(--font-mono); font-size: 0.76rem; margin-top: 14px; min-height: 1.2em; }
+    .inbox-status.ok { color: var(--accent-cyan); }
+    .inbox-status.err { color: #ff8a8a; }
+
+    .inbox-list { display: flex; flex-direction: column; gap: 12px; }
+    .inbox-msg { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 20px; background: var(--bg-surface); }
+    .inbox-msg.unread { border-color: var(--accent-cyan); }
+    .inbox-msg-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+    .inbox-msg-from { font-weight: 600; }
+    .inbox-msg-date { font-family: var(--font-mono); font-size: 0.64rem; color: var(--text-tertiary); white-space: nowrap; }
+    .inbox-msg-email { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan); margin-bottom: 10px; word-break: break-all; }
+    .inbox-msg-subject { font-size: 0.92rem; margin-bottom: 8px; }
+    .inbox-msg-body { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .inbox-msg-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .inbox-mini { font-family: var(--font-mono); font-size: 0.66rem; padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary); cursor: pointer; }
+    .inbox-mini:hover { border-color: var(--border-medium); color: var(--text-primary); }
+    .inbox-empty { text-align: center; padding: 48px 0; color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+  <div class="inbox-shell">
+    <header class="inbox-head">
+      <div>
+        <h1 class="inbox-title">Inbox</h1>
+        <span class="inbox-count" id="count">—</span>
+      </div>
+      <button class="inbox-btn inbox-btn-quiet" id="refresh" type="button">REFRESH</button>
+    </header>
+
+    <!-- Login -->
+    <section id="login-view">
+      <form class="inbox-card" id="login-form">
+        <div class="inbox-field">
+          <label class="inbox-label" for="password">Password</label>
+          <input class="inbox-input" id="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="inbox-btn" id="login-btn" type="submit">SIGN IN</button>
+        <p class="inbox-status" id="login-status"></p>
+      </form>
+    </section>
+
+    <!-- Messages -->
+    <section id="list-view" hidden>
+      <div class="inbox-list" id="messages"></div>
+      <div style="margin-top:28px">
+        <button class="inbox-btn inbox-btn-quiet" id="logout" type="button">SIGN OUT</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

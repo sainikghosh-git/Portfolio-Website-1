@@ -746,6 +746,40 @@
               <span class="btn-arrow-diag">↗</span>
             </a>
           </div>
+
+          <!-- Contact Form (stores to inbox at /admin.html) -->
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="contact-row">
+              <div class="contact-field">
+                <label class="contact-label" for="cf-name">Name</label>
+                <input class="contact-input" id="cf-name" name="name" type="text"
+                       autocomplete="name" maxlength="80" required>
+              </div>
+              <div class="contact-field">
+                <label class="contact-label" for="cf-email">Email</label>
+                <input class="contact-input" id="cf-email" name="email" type="email"
+                       autocomplete="email" maxlength="254" required>
+              </div>
+            </div>
+            <div class="contact-field">
+              <label class="contact-label" for="cf-subject">Subject <span class="contact-optional">(optional)</span></label>
+              <input class="contact-input" id="cf-subject" name="subject" type="text" maxlength="120">
+            </div>
+            <div class="contact-field">
+              <label class="contact-label" for="cf-message">Message</label>
+              <textarea class="contact-input contact-textarea" id="cf-message" name="message"
+                        rows="5" maxlength="2000" required></textarea>
+            </div>
+            <!-- Honeypot: hidden from people, irresistible to bots -->
+            <div class="contact-trap" aria-hidden="true">
+              <label for="cf-website">Website</label>
+              <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="contact-submit-row">
+              <button class="btn-primary contact-submit" id="cf-submit" type="submit">SEND MESSAGE</button>
+              <p class="contact-status" id="cf-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
         </div>
 
         <div class="contact-right">
@@ -818,5 +852,6 @@
   </main>
 
   <script src="app.js"></script>
+<script src="contact.js"></script>
 </body>
 </html>

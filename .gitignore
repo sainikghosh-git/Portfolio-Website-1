@@ -17,3 +17,11 @@ server.log
 Thumbs.db
 .vscode/
 .idea/
+
+# Local env files - NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Admin page should not be indexed even if headers are stripped
+admin.html.bak
