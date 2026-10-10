@@ -25,3 +25,5 @@ Thumbs.db
 
 # Admin page should not be indexed even if headers are stripped
 admin.html.bak
+# Local dev server log
+dev-server.log
