@@ -34,12 +34,15 @@ function validateContact(payload) {
   const name = clean(payload && payload.name, LIMITS.name);
   const email = clean(payload && payload.email, LIMITS.email).toLowerCase();
 
-  // Messages are the one field where newlines are legitimate.
+  // Messages are the one field where newlines are legitimate. The strip below
+  // skips \n (0x0A) on purpose - it sits inside the \u0000-\u001F range, so
+  // stripping it would flatten multi-paragraph messages onto a single line.
+  // Tab (0x09) is still removed as noise.
   const message =
     typeof (payload && payload.message) === 'string'
       ? payload.message
           .replace(/\r\n/g, '\n')
-          .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+          .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F]/g, '')
           .trim()
           .slice(0, LIMITS.message)
       : '';
