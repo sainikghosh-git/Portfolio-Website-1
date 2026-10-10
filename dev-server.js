@@ -45,21 +45,21 @@ const MIME = {
 };
 
 // ---- in-memory "database" ----
-let messages = [
-  {
-    id: 1, name: 'Priya Sharma', email: 'priya@example.com', subject: 'Internship opportunity',
-    message: "Hi Sainik,\n\nI came across your portfolio and wanted to reach out about a summer internship role on our AI tooling team.\n\nWe'd love to chat about your work with agentic workflows.\n\nBest,\nPriya",
-    is_read: false,
-    created_at: new Date(Date.now() - 3600_000 * 5).toISOString(),
-  },
-  {
-    id: 2, name: 'Arjun Mehta', email: 'arjun.dev@example.com', subject: 'Collaboration on DSA project',
-    message: 'Hey! I like the Java DSA suite you built.\n\nWant to collab on a LeetCode challenge tracker as a side project?',
-    is_read: true,
-    created_at: new Date(Date.now() - 3600_000 * 30).toISOString(),
-  },
-];
-let nextId = 3;
+// Starts empty so the inbox only ever shows real submissions.
+// Set SEED_DEMO=1 if you specifically want sample rows for UI work.
+let messages = [];
+let nextId = 1;
+
+if (process.env.SEED_DEMO === '1') {
+  messages = [
+    {
+      id: nextId++, name: 'Sample Sender', email: 'sample@example.com',
+      subject: 'Demo message',
+      message: 'This is a seeded demo row.\n\nDelete me.',
+      is_read: false, created_at: new Date().toISOString(),
+    },
+  ];
+}
 
 function sendJson(res, status, body, extraHeaders = {}) {
   const payload = JSON.stringify(body);
@@ -233,6 +233,7 @@ server.listen(PORT, () => {
   console.log('');
   console.log('  Admin password:  WyPZ-PmYeg5ZV39Cdohk6q4_');
   console.log('');
-  console.log('  Messages are stored in memory and reset when you stop this.');
+  console.log('  Inbox starts empty. Messages are in memory and reset on stop.');
+  console.log('  (SEED_DEMO=1 node dev-server.js to add a sample row)');
   console.log('  Press Ctrl+C to stop.\n');
 });
