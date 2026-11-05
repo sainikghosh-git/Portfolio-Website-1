@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
       }
 
       const isRead = body.isRead === true;
-      await update('messages', { read: isRead }, { id });
+      await update('messages', { id }, { read: isRead });
       return json(res, 200, { ok: true, id, isRead });
     }
 
