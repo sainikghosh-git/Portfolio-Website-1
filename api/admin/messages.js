@@ -1,20 +1,34 @@
-const { query, json } = require('../_lib/db.js');
+const { getClient, update, json } = require('../_lib/supabase.js');
 const { isAuthenticated } = require('../_lib/auth.js');
 
 /**
  * GET    /api/admin/messages?limit=&offset=  -> list stored messages
  * PATCH  /api/admin/messages                 -> { id, isRead } mark read/unread
- * DELETE /api/admin/messages?id=123          -> delete one
+ * DELETE /api/admin/messages?id=<uuid>       -> delete one
  *
  * All methods require a valid session cookie. Vercel routes by filename, so
  * these live in one file to share the /api/admin/messages path.
+ *
+ * Data comes from the Supabase `messages` table (db/supabase-messages-table.sql).
+ * The column is `read`; responses map it to `is_read` so admin.js is unchanged
+ * there, and ids are UUID strings.
  */
+const COLUMNS = 'id, name, email, subject, message, created_at, read';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function toInboxRow(row) {
+  const { read, ...rest } = row;
+  return { ...rest, is_read: !!read };
+}
+
 module.exports = async function handler(req, res) {
   // Auth first, before revealing anything about method or payload shape.
   if (!isAuthenticated(req)) {
     return json(res, 401, { error: 'Not authenticated' });
   }
 
+  // Vercel hands us an already-parsed object for JSON content types; the dev
+  // server and older clients may send a raw string. Handle both.
   let body = {};
   if (typeof req.body === 'string' && req.body.length > 0) {
     try {
@@ -22,6 +36,8 @@ module.exports = async function handler(req, res) {
     } catch (_) {
       return json(res, 400, { error: 'Invalid request' });
     }
+  } else if (req.body && typeof req.body === 'object') {
+    body = req.body;
   }
 
   try {
@@ -30,43 +46,44 @@ module.exports = async function handler(req, res) {
       const limit = Math.min(Number(q.limit) || 50, 200);
       const offset = Math.max(Number(q.offset) || 0, 0);
 
-      const result = await query(
-        'SELECT id, name, email, subject, message, created_at, is_read ' +
-          'FROM messages ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-        [limit, offset]
-      );
-
-      const countResult = await query('SELECT COUNT(*)::int AS total FROM messages');
-      const total =
-        (countResult.rows && countResult.rows[0] && countResult.rows[0].total) || 0;
+      const { data, count, error } = await getClient()
+        .from('messages')
+        .select(COLUMNS, { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+      if (error) throw new Error(error.message);
 
       return json(res, 200, {
-        messages: result.rows || [],
-        total,
+        messages: (data || []).map(toInboxRow),
+        total: count ?? (data || []).length,
         limit,
         offset,
       });
     }
 
     if (req.method === 'PATCH') {
-      const id = Number(body.id);
-      if (!Number.isInteger(id) || id <= 0) {
+      const id = typeof body.id === 'string' ? body.id.trim() : '';
+      if (!UUID_RE.test(id)) {
         return json(res, 400, { error: 'A valid message id is required' });
       }
 
       const isRead = body.isRead === true;
-      await query('UPDATE messages SET is_read = $1 WHERE id = $2', [isRead, id]);
+      await update('messages', { read: isRead }, { id });
       return json(res, 200, { ok: true, id, isRead });
     }
 
     if (req.method === 'DELETE') {
       const q = req.query || {};
-      const id = Number(q.id);
-      if (!Number.isInteger(id) || id <= 0) {
+      const id = typeof q.id === 'string' ? q.id : '';
+      if (!UUID_RE.test(id)) {
         return json(res, 400, { error: 'A valid message id is required' });
       }
 
-      await query('DELETE FROM messages WHERE id = $1', [id]);
+      const { error } = await getClient()
+        .from('messages')
+        .delete()
+        .eq('id', id);
+      if (error) throw new Error(error.message);
       return json(res, 200, { ok: true, id });
     }
 

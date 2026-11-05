@@ -1,4 +1,4 @@
-const { json } = require('../_lib/db.js');
+const { json } = require('../_lib/supabase.js');
 const { clearSessionCookie } = require('../_lib/auth.js');
 
 /**

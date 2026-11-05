@@ -1,4 +1,4 @@
-const { json } = require('../_lib/db.js');
+const { json } = require('../_lib/supabase.js');
 const { verifyPassword, setSessionCookie } = require('../_lib/auth.js');
 const { rateLimit, clientIp } = require('../_lib/rate-limit.js');
 

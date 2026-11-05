@@ -4,8 +4,8 @@
  *   node dev-server.js
  *
  * Serves your static site AND the /api routes with an in-memory message list,
- * so you can test the whole flow on localhost without deploying, without Neon,
- * and without touching any real credentials.
+ * so you can test the whole flow on localhost without deploying and without
+ * touching any real credentials.
  *
  * This is a development tool only. It is NOT used by Vercel.
  */

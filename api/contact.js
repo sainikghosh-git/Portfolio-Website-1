@@ -1,10 +1,10 @@
-const { query, json } = require('./_lib/db.js');
+const { insert, json } = require('./_lib/supabase.js');
 const { rateLimit, clientIp } = require('./_lib/rate-limit.js');
 const { validateContact } = require('./_lib/validate.js');
 
 /**
  * POST /api/contact
- * Public endpoint. Accepts a message, stores it for the admin inbox.
+ * Public endpoint. Accepts a message, stores it in Supabase for the admin inbox.
  */
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -52,10 +52,17 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    await query(
-      'INSERT INTO messages (name, email, subject, message) VALUES ($1, $2, $3, $4)',
-      [values.name, values.email, values.subject, values.message]
-    );
+    // 'unknown' (no proxy header) is not a valid INET value for Supabase.
+    const ipRaw = clientIp(req);
+    await insert('messages', {
+      name:       values.name,
+      email:      values.email,
+      subject:    values.subject || null,
+      message:    values.message,
+      ip:         ipRaw && ipRaw !== 'unknown' ? ipRaw : null,
+      user_agent: (req.headers['user-agent'] || '').slice(0, 512) || null,
+      read:       false,
+    });
   } catch (err) {
     console.error('contact insert failed:', err.message);
     return json(res, 500, {

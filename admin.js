@@ -80,7 +80,7 @@
 
     listEl.innerHTML = messages
       .map((m) => {
-        const id = Number(m.id);
+        const id = String(m.id);
         const subject = m.subject ? escapeHtml(m.subject) : '(no subject)';
         return `
       <article class="inbox-msg ${m.is_read ? '' : 'unread'}" data-id="${id}">
@@ -149,8 +149,8 @@
     if (!btn) return;
 
     const card = btn.closest('.inbox-msg');
-    const id = Number(card?.dataset.id);
-    if (!Number.isInteger(id)) return;
+    const id = card?.dataset.id;
+    if (!id) return;
 
     const action = btn.dataset.action;
 

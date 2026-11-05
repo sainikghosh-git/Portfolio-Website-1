@@ -4,8 +4,8 @@
  *   node test/api.test.js
  *
  * Mocks req/res so we can assert routing, auth gates, and validation without a
- * live database. Neon itself is stubbed at the module boundary - the real HTTP
- * call is only exercised in production.
+ * live database. Supabase itself is stubbed at the module boundary - the real
+ * HTTP call is only exercised in production.
  */
 const test = require('node:test');
 const assert = require('node:assert');
@@ -18,21 +18,30 @@ process.env.ADMIN_PASSWORD_HASH =
   `pbkdf2-sha256$600000$${salt.toString('hex')}$` +
   crypto.pbkdf2Sync(PASSWORD, salt, 600000, 32, 'sha256').toString('hex');
 
-// Stub the DB before the handlers require it, so no network call is made.
+// Stub the Supabase client before the handlers require it, so no network call is made.
 const inserted = [];
-require.cache[require.resolve('../api/_lib/db.js')] = {
-  id: require.resolve('../api/_lib/db.js'),
-  filename: require.resolve('../api/_lib/db.js'),
+require.cache[require.resolve('../api/_lib/supabase.js')] = {
+  id: require.resolve('../api/_lib/supabase.js'),
+  filename: require.resolve('../api/_lib/supabase.js'),
   loaded: true,
   exports: {
-    query: async (sql, params) => {
-      if (sql.startsWith('INSERT')) {
-        inserted.push(params);
-        return { rows: [] };
-      }
-      if (sql.startsWith('SELECT COUNT')) return { rows: [{ total: inserted.length }] };
-      return { rows: [] };
+    insert: async (table, values) => {
+      inserted.push(values);
+      return [values];
     },
+    update: async () => [{}],
+    getClient: () => ({
+      from: () => ({
+        select: () => ({
+          order: () => ({
+            range: async () => ({ data: [], count: 0, error: null }),
+          }),
+        }),
+        delete: () => ({
+          eq: async () => ({ error: null }),
+        }),
+      }),
+    }),
     json: (res, status, body) => res.status(status).json(body),
   },
 };
@@ -92,9 +101,15 @@ test('contact: same-origin POST stores the message', async () => {
   );
   assert.strictEqual(res._status, 200);
   assert.strictEqual(inserted.length, before + 1);
-  assert.deepStrictEqual(inserted[inserted.length - 1], [
-    'Alice', 'alice@example.com', 'Hello', 'A real message body.'
-  ]);
+  assert.deepStrictEqual(inserted[inserted.length - 1], {
+    name: 'Alice',
+    email: 'alice@example.com',
+    subject: 'Hello',
+    message: 'A real message body.',
+    ip: null,
+    user_agent: null,
+    read: false,
+  });
 });
 
 test('contact: no Origin header is allowed (non-browser client)', async () => {

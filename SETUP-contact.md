@@ -1,11 +1,11 @@
 # Contact form + admin inbox
 
-A contact form on the portfolio that stores submissions in **Neon** (serverless
-Postgres), plus a password-protected inbox at `/admin.html`.
+A contact form on the portfolio that stores submissions in **Supabase**
+(Postgres), plus a password-protected inbox at `/admin.html`.
 
-No npm dependencies — the API talks to Neon's HTTP SQL interface directly, so
-there is no `node_modules`, no `package.json`, and no build step. Your existing
-static site deploys exactly as before.
+The API uses the `@supabase/supabase-js` npm package (see `package.json`) with
+the service-role key on the server only, so Row Level Security never blocks
+form writes. Your existing static site deploys exactly as before.
 
 ```
 api/
@@ -13,23 +13,27 @@ api/
   admin/login.js      POST  password -> signed session cookie
   admin/logout.js     POST  clears the cookie
   admin/messages.js   GET/PATCH/DELETE  list, mark read, delete
-  _lib/db.js          Neon HTTP SQL client
+  _lib/supabase.js    Supabase service-role client (server only)
   _lib/auth.js        PBKDF2 verify + HMAC session cookie
   _lib/rate-limit.js  in-memory fixed-window limiter
   _lib/validate.js    input validation + honeypot check
 admin.html            inbox UI
 admin.js              inbox client
 contact.js            form submit handler
-db/schema.sql         run once in Neon
+db/supabase-messages-table.sql   run once in the Supabase SQL Editor
 db/hash-password.html browser-based hash generator (no install needed)
 db/hash-password.mjs  same thing for Node users
+db/schema.sql         legacy Neon schema (kept for reference; do not use)
 ```
 
 ---
 
 ## 1. Create the table
 
-In the Neon console, paste and run `db/schema.sql`.
+In the Supabase Dashboard → **SQL Editor**, paste and run
+`db/supabase-messages-table.sql`. It creates the `messages` table with RLS
+enabled (public insert only from the form; the API uses the service-role key,
+which bypasses RLS).
 
 ---
 
@@ -65,12 +69,14 @@ pbkdf2-sha256$600000$<salt-hex>$<hash-hex>
 
 ## 3. Set environment variables
 
-In **Vercel → Project → Settings → Environment Variables**, add all three.
+In **Vercel → Project → Settings → Environment Variables**, add all five.
 Mark them for **Production** (and Preview if you want to test there).
 
 | Variable | Where to get it |
-|----------|------------------|
-| `DATABASE_URL` | Neon → Project → **Connect** → Connection Details → *Pooled connection* |
+|----------|-----------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → *Project URL* |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase → Project Settings → API → *publishable key* |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API → *service_role key* (server-side only) |
 | `ADMIN_PASSWORD_HASH` | Output from step 2 |
 | `SESSION_SECRET` | Any 32+ random characters (see below) |
 
@@ -110,9 +116,13 @@ The raw password is never stored or logged.
 `SameSite=Strict` cookie (8 hour expiry). No session table. The cookie can't be
 read by JavaScript, so an XSS bug can't exfiltrate it.
 
-**SQL injection** — every query uses Postgres placeholders (`$1`, `2`).
-User input is never concatenated into SQL. Deletes coerce `id` with `Number()`
-and validate it's a positive integer before it reaches the query.
+**SQL injection** — there is no raw SQL in the request path. `@supabase/supabase-js`
+sends parameterized PostgREST requests, and message ids are validated as UUIDs
+before they reach the database. User input is never concatenated into a query.
+
+**Supabase RLS** — the `messages` table denies all browser access except public
+INSERT. Reads/updates/deletes only happen from the server-side API with the
+service-role key, behind your admin password.
 
 **Spam** — a honeypot field (`website`) that people can't see but bots fill;
 bot submissions return success so the bot gets no feedback. Plus per-IP rate
